@@ -39,6 +39,7 @@ class Change(BaseModel):
     old_path: str
     new_path: str
     diff_gzip_base64_encoded: str
+    file: str
 
 
 class ChangesResponse(BaseModel):

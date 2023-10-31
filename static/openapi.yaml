@@ -141,6 +141,8 @@ components:
                 type: string
               new_path:
                 type: string
+              file:
+                type: string
               diff_gzip_base64_encoded:
                 type: string
                 description: "Gzipped and Base64 encoded diff content"
