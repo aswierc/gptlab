@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: "Gptlab"
+  description: "Gptlab is a GPT Chat integration plugin for GitLab, enabling users to browse merge requests and analyze code within the chat."
+
+paths:
+  /ping:
+    get:
+      operationId: "getPing"
+      summary: "Ping the API to check if it's running"
+      responses:
+        200:
+          description: "Returns pong true"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pong:
+                    type: string
+                    example: "true"
+
+  /gitlab-projects:
+    get:
+      operationId: "getGitlabProjects"
+      summary: "Retrieve GitLab projects"
+      responses:
+        200:
+          description: "List of GitLab projects"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    project_id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "user/project_name"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /gitlab-projects/{project_id}/merge_requests:
+    get:
+      operationId: "getGitlabMergeRequests"
+      summary: "Retrieve merge requests for a given project"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "List of merge requests for the specified project"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MergeRequest'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /gitlab-projects/{project_id}/merge_requests/{merge_request_iid}/changes:
+    get:
+      operationId: "getGitlabMergeRequestChanges"
+      summary: "Retrieve changes for a given merge request in a project"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+      - name: "merge_request_iid"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "List of changes for the specified merge request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeRequestChanges'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+
+    MergeRequest:
+      type: object
+      properties:
+        merge_request_id:
+          type: integer
+        merge_request_iid:
+          type: integer
+        source_branch:
+          type: string
+        target_branch:
+          type: string
+        title:
+          type: string
+
+    MergeRequestChanges:
+      type: object
+      properties:
+        merge_request_iid:
+          type: integer
+        project_id:
+          type: integer
+        changes:
+          type: array
+          items:
+            type: object
+            properties:
+              old_path:
+                type: string
+              new_path:
+                type: string
+              diff_gzip_base64_encoded:
+                type: string
+                description: "Gzipped and Base64 encoded diff content"

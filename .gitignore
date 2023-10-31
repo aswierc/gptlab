@@ -130,3 +130,7 @@ dmypy.json
 
 # intellij
 .idea
+
+files
+.env
+.DS_Store
