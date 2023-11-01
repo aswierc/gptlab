@@ -1,39 +1,44 @@
-# ChatGPT plugins quickstart
+# Gptlab
 
-Get a todo list ChatGPT plugin up and running in under 5 minutes using Python. This plugin is designed to work in conjunction with the [ChatGPT plugins documentation](https://platform.openai.com/docs/plugins). If you do not already have plugin developer access, please [join the waitlist](https://openai.com/waitlist/plugins).
+![Gptlab Logo](./static/logo.png)
 
-## Setup locally
+Gptlab is an integration plugin designed to connect ChatGPT with GitLab. Its main functionality revolves around enabling users to browse merge requests, analyze code, and extract various details related to projects directly within the chat interface. This offers a seamless and efficient way to keep track of GitLab projects without the need to continuously check the platform.
 
-To install the required packages for this plugin, run the following command:
+## Project Setup
 
-```bash
-pip install -r requirements.txt
+### Prerequisites:
+
+Ensure you have Docker and docker-compose installed on your machine.
+
+### Initial Steps:
+
+1. **Environment Variables:** Make sure you have set the necessary environment variables in your `.env` file.
+   
+   - `GITLAB_API_URL`: The URL of your GitLab instance.
+   
+   - `GITLAB_PERSONAL_TOKEN`: This is your personal access token from GitLab. If you don't have one, you can create it by going to GitLab -> User Settings -> Access Tokens. Ensure the token has the required permissions to read the repository and other relevant scopes.
+
+2. **Running the Service:** Use docker-compose to spin up the application. In the root directory, run:
+   ```
+   docker-compose build 
+   docker-compose up
+   ```
+
+Once the application is running, you can access the FastAPI's automatic interactive API documentation at `http://localhost:3000/docs`.
+
+## Gptlab with ChatGPT
+
+To integrate Gptlab with ChatGPT, you need to:
+
+1. Set up and run the Gptlab plugin on your server (as described above).
+2. Connect your ChatGPT instance to the Gptlab API endpoint. Usually, this involves providing the Gptlab API endpoint (`http://localhost:3000/`) to ChatGPT.
+
+## Sample Prompt for ChatGPT
+
+Once you've integrated the Gptlab plugin with ChatGPT, you can ask the following question to understand what ChatGPT can do with the Gptlab plugin:
+
+```
+Hello ChatGPT, what can you do with the Gptlab plugin?
 ```
 
-To run the plugin, enter the following command:
-
-```bash
-python main.py
-```
-
-Once the local server is running:
-
-1. Navigate to https://chat.openai.com. 
-2. In the Model drop down, select "Plugins" (note, if you don't see it there, you don't have access yet).
-3. Select "Plugin store"
-4. Select "Develop your own plugin"
-5. Enter in `localhost:5003` since this is the URL the server is running on locally, then select "Find manifest file".
-
-The plugin should now be installed and enabled! You can start with a question like "What is on my todo list" and then try adding something to it as well! 
-
-## Setup remotely
-
-### Cloudflare workers
-
-### Code Sandbox
-
-### Replit
-
-## Getting help
-
-If you run into issues or have questions building a plugin, please join our [Developer community forum](https://community.openai.com/c/chat-plugins/20).
+In response, ChatGPT will provide a list of available functionalities and operations it can perform using the Gptlab plugin, such as browsing merge requests, analyzing code, and answering questions about project details.

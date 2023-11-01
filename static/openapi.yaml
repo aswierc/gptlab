@@ -1,26 +1,10 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0"
+  version: "1.0.1"
   title: "Gptlab"
   description: "Gptlab is a GPT Chat integration plugin for GitLab, enabling users to browse merge requests and analyze code within the chat."
 
 paths:
-  /ping:
-    get:
-      operationId: "getPing"
-      summary: "Ping the API to check if it's running"
-      responses:
-        200:
-          description: "Returns pong true"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  pong:
-                    type: string
-                    example: "true"
-
   /gitlab-projects:
     get:
       operationId: "getGitlabProjects"
@@ -33,14 +17,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    project_id:
-                      type: integer
-                      example: 1
-                    name:
-                      type: string
-                      example: "user/project_name"
+                  $ref: '#/components/schemas/Project'
         default:
           description: "Unexpected error"
           content:
@@ -74,6 +51,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /gitlab-projects/{project_id}/merge_requests/{merge_request_iid}/changed_files:
+    get:
+      operationId: "getGitlabMergeRequestChangedFiles"
+      summary: "Retrieve list of changed files for a given merge request in a project"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+      - name: "merge_request_iid"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "List of changed files for the specified merge request"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
   /gitlab-projects/{project_id}/merge_requests/{merge_request_iid}/changes:
     get:
       operationId: "getGitlabMergeRequestChanges"
@@ -95,7 +97,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MergeRequestChanges'
+                $ref: '#/components/schemas/Changes'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /gitlab-projects/{project_id}/branch/{source_branch}/files/{file_path}:
+    get:
+      operationId: "getFileContent"
+      summary: "Retrieve content of a file for a given branch in a project"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        required: true
+        schema:
+          type: integer
+      - name: "source_branch"
+        in: "path"
+        required: true
+        schema:
+          type: string
+      - name: "file_path"
+        in: "path"
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: "Content of the specified file"
+          content:
+            text/plain:
+              schema:
+                type: string
         default:
           description: "Unexpected error"
           content:
@@ -109,6 +145,14 @@ components:
       type: object
       properties:
         detail:
+          type: string
+
+    Project:
+      type: object
+      properties:
+        project_id:
+          type: integer
+        name:
           type: string
 
     MergeRequest:
@@ -125,7 +169,20 @@ components:
         title:
           type: string
 
-    MergeRequestChanges:
+    Change:
+      type: object
+      properties:
+        old_path:
+          type: string
+        new_path:
+          type: string
+        diff_gzip_base64_encoded:
+          type: string
+          description: "Gzipped and Base64 encoded diff content"
+        file:
+          type: string
+
+    Changes:
       type: object
       properties:
         merge_request_iid:
@@ -135,14 +192,4 @@ components:
         changes:
           type: array
           items:
-            type: object
-            properties:
-              old_path:
-                type: string
-              new_path:
-                type: string
-              file:
-                type: string
-              diff_gzip_base64_encoded:
-                type: string
-                description: "Gzipped and Base64 encoded diff content"
+            $ref: '#/components/schemas/Change'
